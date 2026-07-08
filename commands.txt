@@ -1,0 +1,75 @@
+# CLAIRE emulator_bench commands
+
+# Validate environment imports.
+conda run -n mldb \
+python -c "import pandas, torch, sklearn, pyarrow, drfp, rxnfp, optuna, rich; print('ok')"
+
+# Copy and validate EMULaToR splits for CLAIRE.
+conda run -n mldb \
+python -m emulator_bench.dataset_adapter \
+  --gpus 2
+
+# Cache DRFP+rxnfp features once for all reactions.
+conda run -n mldb \
+python -m emulator_bench.cache_features \
+  --gpus 2 \
+  --batch_size 128 \
+  --rxnfp_batch_size 128 \
+  --drfp_workers 1 \
+  --save_workers 2
+
+# Run all split groups and L1-L4 models with paper/default settings.
+conda run -n mldb \
+python -m emulator_bench.run_split_benchmarks \
+  --gpus 2 \
+  --cache_batch_size 128 \
+  --cache_rxnfp_batch_size 128 \
+  --cache_drfp_workers 1 \
+  --cache_save_workers 2
+
+# Run multiple seeds with two concurrent training jobs per physical GPU.
+conda run -n mldb \
+python -m emulator_bench.run_split_benchmarks \
+  --gpus 2 \
+  --parallel_runs_per_gpu 9 \
+  --seeds 666 777 888 \
+  --progress_interval 10 \
+  --cache_batch_size 128 \
+  --cache_rxnfp_batch_size 128 \
+  --cache_drfp_workers 1 \
+  --cache_save_workers 2
+
+# Smoke test one level on the random split.
+conda run -n mldb \
+python -m emulator_bench.run_split_benchmarks \
+  --gpus 2 \
+  --split_groups random_splits \
+  --levels l1 \
+  --epochs 1 \
+  --batch_size 128 \
+  --cache_batch_size 128 \
+  --cache_rxnfp_batch_size 128 \
+  --cache_drfp_workers 1 \
+  --cache_save_workers 2
+
+# Tune safe retraining hyperparameters for one job.
+conda run -n mldb \
+python -m emulator_bench.tune_optuna \
+  --gpus 2 \
+  --train_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/train.parquet \
+  --val_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/val.parquet \
+  --test_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/test.parquet \
+  --out_dir /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/optuna_l1 \
+  --level l1 \
+  --n_trials 20
+
+# Parallel Optuna workers require shared Optuna storage, for example sqlite.
+conda run -n mldb \
+python -m emulator_bench.launch_parallel_optuna \
+  --gpus 2 \
+  --train_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/train.parquet \
+  --val_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/val.parquet \
+  --test_path /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/test.parquet \
+  --out_dir /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/random_splits/parallel_optuna_l1 \
+  --level l1 \
+  --storage sqlite:////home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/optuna_studies/claire_l1.db

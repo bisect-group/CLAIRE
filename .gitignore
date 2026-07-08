@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+emulator_bench/**/checkpoint_last.pt
+emulator_bench/**/bestmodel_state_dict.pth
+emulator_bench/**/logfile.csv
+emulator_bench/**/predictions.csv
+emulator_bench/**/metrics.json
+emulator_bench/**/run_summary.json
+emulator_bench/**/optuna_best_hparams.json
+emulator_bench/**/trial_*/
+emulator_bench/**/worker_*/
