@@ -26,7 +26,7 @@ EC validation uses official syntax rather than synthetic numeric ranges. L1 must
 2. Cache DRFP and rxnfp features for every unique reaction that appears in selected splits.
 3. Train separate EC-level models for L1, L2, L3, and L4.
 4. Evaluate each model with nearest-neighbor lookup against the train split.
-5. Aggregate per-level weighted F1, accuracy, top-k accuracy, and EC prefix accuracy.
+5. Aggregate per-level weighted F1, accuracy, top-k accuracy, and EC prefix accuracy with `python -m emulator_bench.aggregate_results`. The wrapper reports validation and test partitions separately, validates metrics against saved predictions, and writes per-seed CSV, grouped CSV/JSON, and diagnostics artifacts.
 6. Optionally run Optuna over retraining-safe optimization settings and launch retraining from best hyperparameters.
 
 ## Smoke Test

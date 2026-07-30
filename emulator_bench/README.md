@@ -97,6 +97,23 @@ Each split/level/seed run writes:
 - `test/metrics.json`
 - `run_summary.json`
 
+## Aggregate Metrics
+
+Aggregate validation and test metrics across every discovered split, EC level, and seed:
+
+```bash
+conda run -n mldb python -m emulator_bench.aggregate_results \
+  --base-dir /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE \
+  --output-dir /home/adhil/github/EMULaToR/data/processed/baselines/CLAIRE/aggregated_metrics
+```
+
+The command writes `per_run_metrics.csv`, `summary_metrics.csv`,
+`summary_metrics.json`, and `diagnostics.json`. It validates saved metrics
+against `predictions.csv`, reports incomplete runs without discarding completed
+seeds, and treats validation and test partitions separately. Add `--strict` to
+return a nonzero status when any run is incomplete or invalid; use
+`--split-groups random_splits` to limit the report.
+
 ## Resume Behavior
 
 Re-running a command:
