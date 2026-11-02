@@ -1,0 +1,28 @@
+# Run every command from the submodule root: baselines/CLAIRE
+# PY is a python with torch, numba, pandas, pyarrow, rxnfp, drfp, rdkit, transformers<5, setuptools<81.
+PY=python
+
+# Check the wrapper against the original code (CPU)
+bash emulator_bench/verify_equivalence.sh
+
+# Dry run: list the runs
+$PY -m emulator_bench.run_all --gpus 0 --runs_per_gpu 1 --dry_run
+
+# Build the feature cache (run_all does this first; 9 minutes on an A100 for the three splits)
+$PY -m emulator_bench.build_features
+
+# Smoke test: one split, one seed, 64 rows, 2 epochs
+$PY -m emulator_bench.run_one --split_groups uniprot_time_splits --seeds 666 --epochs 2 --sample_rows 64 --out_root /tmp/claire_smoke
+
+# One run
+$PY -m emulator_bench.run_one --split_groups reaction_drfp_tanimoto_splits --split_name threshold_0.425 --seeds 666 --amp
+
+# All splits and seeds on GPU 1, one run at a time, bf16 (about 4.6 h on an A100)
+D=/home/adhil/github/EMULaToR/outputs/baselines/MLP/data/classification_protein/enzyme_retrieval_dataset
+$PY -m emulator_bench.run_all --gpus 1 --runs_per_gpu 1 --amp --dataset_root $D
+
+# Same in fp32, the original precision (about 17 h on an A100)
+$PY -m emulator_bench.run_all --gpus 1 --runs_per_gpu 1 --dataset_root $D
+
+# Rebuild the summary files from the saved predictions
+$PY -m emulator_bench.results --out_root outputs/baselines/CLAIRE

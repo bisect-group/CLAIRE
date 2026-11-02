@@ -1,0 +1,33 @@
+{
+  "hparams": {
+    "input_dim": 512,
+    "hidden_dim": 1280,
+    "out_dim": 128,
+    "num_layers": 5,
+    "dropout": 0.1,
+    "learning_rate": 0.0001,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "margin": 1.0,
+    "batch_size": 6000,
+    "epochs": 2000,
+    "adaptive_rate": 200,
+    "top_k": 50
+  },
+  "sources": {
+    "input_dim": "paper Methods: rxnfp 256 + DRFP 256; train-pred_rxn_EC.py:17",
+    "hidden_dim": "paper Hyperparameter tuning (1280); train-pred_rxn_EC.py:18",
+    "out_dim": "train-pred_rxn_EC.py:19 (128)",
+    "num_layers": "paper (5); train-pred_rxn_EC.py:20",
+    "dropout": "train-pred_rxn_EC.py:27 (LayerNormNet drop_out=0.1)",
+    "learning_rate": "paper Hyperparameter tuning (0.0001). The script default is 5e-4 (train-pred_rxn_EC.py:15), but it saves its loss as train_loss_10-4.pkl, so the run used 1e-4. Open issue.",
+    "betas": "train-pred_rxn_EC.py:96 (0.9, 0.999)",
+    "margin": "paper (alpha = 1); train-pred_rxn_EC.py:97",
+    "batch_size": "train-pred_rxn_EC.py:100",
+    "epochs": "train-pred_rxn_EC.py:16 (2000); README model name layer5_node1280_triplet2000_final",
+    "adaptive_rate": "train-pred_rxn_EC.py:21,106 (200): new Adam every 200 epochs",
+    "top_k": "wrapper: ranked ECs saved per test reaction"
+  }
+}
